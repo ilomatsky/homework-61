@@ -51,7 +51,7 @@ function App() {
           setCountryInfo(response.data);
 
           if (response.data && response.data.borders) {
-            setBorderCountries([]); // Сброс граничащих стран перед загрузкой новой информации
+            setBorderCountries([]); 
             const borderCountriesResponse = await fetchBorderCountriesInfo(response.data.borders);
             setBorderCountries(borderCountriesResponse);
           }
