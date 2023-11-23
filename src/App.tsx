@@ -1,8 +1,10 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import './App.css';
+import CountryList from './components/CountryList/CountryList';
+import CountryInfo from './components/CountryInfo/CountryInfo';
 
-interface Country {
+export interface Country {
   alpha3Code: string;
   name: string;
   translations: {
@@ -63,9 +65,9 @@ function App() {
     };
 
     const fetchBorderCountriesInfo = async (borders: string[]) => {
-      const borderPromises = borders.map(border => axios.get(`https://restcountries.com/v2/alpha/${border}`));
+      const borderPromises = borders.map((border) => axios.get(`https://restcountries.com/v2/alpha/${border}`));
       const borderResponses = await Promise.all(borderPromises);
-      return borderResponses.map(response => response.data);
+      return borderResponses.map((response) => response.data);
     };
 
     fetchCountryInfo();
@@ -73,66 +75,14 @@ function App() {
 
   return (
     <div className="App">
-      <div className="country-list">
-        {loadingCountries ? (
-          <p>Loading countries...</p>
-        ) : (
-          <ul>
-            {countries.map((country) => (
-              <li
-                key={country.alpha3Code}
-                className="country"
-                onClick={() => {
-                  setSelectedCountry(country.alpha3Code);
-                  setCountryInfo(null);
-                  setBorderCountries([]); // Сброс граничащих стран при выборе новой страны
-                }}
-              >
-                {country.translations['ru'] || country.name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="country-info">
-        {selectedCountry ? (
-          <div className="country-data">
-            {loadingCountryInfo ? (
-              <p>Loading country information...</p>
-            ) : (
-              <div>
-                <h1>{countryInfo?.translations['ru'] || countryInfo?.name}</h1>
-                {countryInfo ? (
-                  <div>
-                    <img className="flag" src={countryInfo.flags.svg} alt="flag"/>
-                    <p>Capital: {countryInfo.capital}</p>
-                    <p>Population: {countryInfo.population}</p>
-                    <p>Area: {countryInfo.area} km²</p>
-                    <p>
-                      Borders with:{' '}
-                      {borderCountries.length > 0
-                        ? borderCountries.map(borderCountry => (
-                          <span key={borderCountry.alpha3Code}>
-                              {borderCountry.translations && borderCountry.translations['ru']
-                                ? borderCountry.translations['ru']
-                                : borderCountry.name}
-                            ,{' '}
-                            </span>
-                        ))
-                        : 'The country has no land borders'}
-                    </p>
-                  </div>
-                ) : (
-                  <p>Error when getting information about the country</p>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className="condition">Select a country</p>
-        )}
-      </div>
+      {loadingCountries ? (
+        <p>Loading countries...</p>
+      ) : (
+        <>
+          <CountryList countries={countries} onSelectCountry={setSelectedCountry} />
+          <CountryInfo countryInfo={countryInfo} loading={loadingCountryInfo} borderCountries={borderCountries} />
+        </>
+      )}
     </div>
   );
 }
